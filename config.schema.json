@@ -104,7 +104,7 @@
                   "title": "Gate/Door Name",
                   "type": "string",
                   "required": true,
-                  "key": "device[].name"
+                  "key": "devices[].name"
                 },
                 {
                   "title": "Gate/Door Type",

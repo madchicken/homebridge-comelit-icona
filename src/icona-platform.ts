@@ -8,7 +8,7 @@ import {
   PlatformConfig,
   Service,
 } from 'homebridge';
-import { PLATFORM_NAME, PLUGIN_NAME } from './index';
+import { IconaPlatformConfig, PLATFORM_NAME, PLUGIN_NAME } from './index';
 import { IconaBridgeClient } from 'comelit-client/dist/icona-bridge-client';
 import { GateAccessory } from './accessories/gate-accessory';
 import { capitalize } from 'lodash';
@@ -29,10 +29,10 @@ export class IconaPlatform implements DynamicPlatformPlugin {
     this.Service = this.api.hap.Service;
     this.Characteristic = this.api.hap.Characteristic;
     this.PlatformAccessory = this.api.platformAccessory;
-    api.on(APIEvent.DID_FINISH_LAUNCHING, this.discoverDevices(config));
+    api.on(APIEvent.DID_FINISH_LAUNCHING, this.discoverDevices(config as IconaPlatformConfig));
   }
 
-  private discoverDevices(config: PlatformConfig) {
+  private discoverDevices(config: IconaPlatformConfig) {
     return async () => {
       this.log.info('Icona platform: discovering devices...');
       const client = new IconaBridgeClient(config.bridge_url, config.bridge_port, this.log);

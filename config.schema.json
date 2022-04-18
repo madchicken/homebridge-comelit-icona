@@ -32,6 +32,40 @@
         "Description": "Icona communication token. See instruction here https://github.com/madchicken/comelit-client/wiki/Get-your-user-token-for-ICONA-Bridge",
         "type": "string",
         "required": true
+      },
+      "devices": {
+        "type": "array",
+        "items": [
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name of the gate/door",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "title": "Type of the gate",
+                "enum": ["temporized_gate", "simple_gate"]
+              },
+              "opening_time": {
+                "title": "Time in sec spent by the gate/door to open",
+                "type": "number",
+                "default": 20
+              },
+              "closing_time": {
+                "title": "Time in sec spent by the gate/door to close",
+                "type": "number",
+                "default": 20
+              },
+              "opened_time": {
+                "title": "Time in sec the gate/door stays opened",
+                "type": "number",
+                "default": 60
+              }
+            }
+          }
+        ]
       }
     }
   },

@@ -41,27 +41,32 @@
             "properties": {
               "name": {
                 "title": "Name of the gate/door",
-                "type": "string"
+                "type": "string",
+                "key": "devices[].name"
               },
               "type": {
                 "type": "string",
                 "title": "Type of the gate",
-                "enum": ["temporized_gate", "simple_gate"]
+                "enum": ["temporized_gate", "simple_gate"],
+                "key": "devices[].type"
               },
               "opening_time": {
                 "title": "Time in sec spent by the gate/door to open",
                 "type": "number",
-                "default": 20
+                "default": 20,
+                "key": "devices[].opening_time"
               },
               "closing_time": {
                 "title": "Time in sec spent by the gate/door to close",
                 "type": "number",
-                "default": 20
+                "default": 20,
+                "key": "devices[].closing_time"
               },
               "opened_time": {
                 "title": "Time in sec the gate/door stays opened",
                 "type": "number",
-                "default": 60
+                "default": 60,
+                "key": "devices[].opened_time"
               }
             }
           }
@@ -80,7 +85,58 @@
       "type": "fieldset",
       "expandable": false,
       "title": "Device settings",
-      "items": ["devices"]
+      "items": [
+        {
+          "type": "help",
+          "helpvalue": "<em class='primary-text'>Enter friendly names for your devices</em>"
+        },
+        {
+          "nodescription": true,
+          "notitle": true,
+          "key": "devices",
+          "type": "array",
+          "orderable": false,
+          "items": [
+            {
+              "type": "div",
+              "displayFlex": true,
+              "flex-direction": "row",
+              "items": [
+                {
+                  "title": "Gate/Door Name",
+                  "type": "string",
+                  "required": true,
+                  "key": "device[].name"
+                },
+                {
+                  "title": "Gate/Door Type",
+                  "type": "string",
+                  "required": true,
+                  "key": "devices[].type"
+                },
+                {
+                  "title": "Opening time",
+                  "type": "number",
+                  "required": true,
+                  "key": "devices[].opening_time"
+                },
+                {
+                  "title": "Closing time",
+                  "type": "number",
+                  "required": true,
+                  "key": "devices[].closing_time"
+                },
+                {
+                  "title": "Stay opened time",
+                  "type": "number",
+                  "required": true,
+                  "key": "devices[].opened_time"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

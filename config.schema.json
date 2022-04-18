@@ -99,8 +99,6 @@
           "items": [
             {
               "type": "div",
-              "displayFlex": true,
-              "flex-direction": "row",
               "items": [
                 {
                   "title": "Gate/Door Name",

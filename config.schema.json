@@ -1,0 +1,71 @@
+{
+  "headerDisplay": "Make sure to give set the right IP address for the HUB",
+  "footerDisplay": "See [homebridge-comelit-hub](https://github.com/madchicken/homebridge-comelit-hub) for more information and instructions.",
+  "singular": false,
+  "pluginAlias": "Icona",
+  "pluginType": "platform",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Installation name",
+        "type": "string",
+        "required": true,
+        "default": "Icona"
+      },
+      "bridge_url": {
+        "title": "Bridge URL (Optional)",
+        "Description": "URL of the Comelit HUB or Icona Bridge on your private network. You can use the Comelit CLI tool to discover it or leave it empty for auto discovery",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      "bridge_port": {
+        "title": "Bridge PORT (Optional)",
+        "Description": "PORT of the Comelit HUB or Icona Bridge on your private network. Default is 64100.",
+        "type": "number",
+        "required": false,
+        "default": 64100
+      },
+      "icona_token": {
+        "title": "ICONA private token",
+        "Description": "Icona communication token. See instruction here https://github.com/madchicken/comelit-client/wiki/Get-your-user-token-for-ICONA-Bridge",
+        "type": "string",
+        "required": true
+      }
+    }
+  },
+  "layout": [
+    {
+      "type": "fieldset",
+      "expandable": false,
+      "title": "Main settings",
+      "items": ["name", "username", "password", "broker_url"]
+    },
+    {
+      "type": "fieldset",
+      "expandable": false,
+      "title": "Blinds settings",
+      "items": ["use_comelit_blind_timing", "blind_opening_time", "blind_closing_time"]
+    },
+    {
+      "type": "fieldset",
+      "expandable": true,
+      "expanded": false,
+      "title": "Advanced settings",
+      "items": [
+        "hub_username",
+        "hub_password",
+        "keep_alive",
+        "avoid_duplicates",
+        "hide_lights",
+        "hide_blinds",
+        "hide_thermostats",
+        "hide_power_suppliers",
+        "hide_outlets",
+        "hide_others",
+        "hide_irrigation"
+      ]
+    }
+  ]
+}

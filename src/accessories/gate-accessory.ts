@@ -60,9 +60,12 @@ export class GateAccessory {
    */
   async handleTargetPositionSet(value) {
     this.log.debug('Triggered SET TargetPosition:' + value);
-    await this.initClient()
-      .then(() => this.log.info(`ICONA Client initialized`))
-      .catch(e => this.log.info(`ICONA Client failed to initialize: ${e.message}`));
+    try {
+      await this.initClient();
+      this.log.info(`ICONA Client initialized`);
+    } catch (e) {
+      this.log.info(`ICONA Client failed to initialize: ${e.message}`);
+    }
     if (this.client) {
       const addressBookAll = this.getAddressBookAll();
       const doorItem = this.getDoorItem();

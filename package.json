@@ -38,7 +38,7 @@
     }
   },
   "dependencies": {
-    "comelit-client": "2.4.0",
+    "comelit-client": "2.4.1",
     "lodash": "4.17.21",
     "typescript": "4.6.2"
   },

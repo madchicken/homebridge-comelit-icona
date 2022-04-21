@@ -15,7 +15,7 @@ export function getDeviceConfigOrDefault(
   doorItem: DoorItem
 ): DeviceConfig {
   return (
-    config.devices.find(d => d.name === doorItem.name) || {
+    config.devices?.find(d => d.name === doorItem.name) || {
       ...DEFAULT_DOOR_CONFIG,
       name: doorItem.name,
     }

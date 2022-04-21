@@ -47,7 +47,7 @@
               "type": {
                 "type": "string",
                 "title": "Type of the gate",
-                "enum": ["temporized_gate", "simple_gate"],
+                "enum": ["lock", "door", "garage_door"],
                 "key": "devices[].type"
               },
               "opening_time": {

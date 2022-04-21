@@ -1,5 +1,6 @@
-import { DeviceConfig, IconaPlatformConfig, SupportedTypes } from './index';
+import { IconaPlatformConfig } from './index';
 import { DoorItem } from 'comelit-client';
+import { DeviceConfig, SupportedTypes } from './types';
 
 export const DEFAULT_DOOR_CONFIG = {
   name: '',

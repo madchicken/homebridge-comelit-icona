@@ -7,9 +7,15 @@ export const PLATFORM_NAME = 'Icona';
 export let hap: HAP;
 export let Accessory: typeof PlatformAccessory;
 
+export enum SupportedTypes {
+  garage_door = 'garage_door',
+  door = 'door',
+  lock = 'lock',
+}
+
 export interface DeviceConfig {
   name: string;
-  type: 'temporized_gate' | 'simple_gate';
+  type: SupportedTypes;
   opening_time: number;
   closing_time: number;
   opened_time: number;

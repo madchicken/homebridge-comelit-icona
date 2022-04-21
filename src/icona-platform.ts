@@ -1,6 +1,7 @@
 import {
   API,
   APIEvent,
+  Categories,
   Characteristic,
   DynamicPlatformPlugin,
   Logging,
@@ -10,7 +11,7 @@ import {
 } from 'homebridge';
 import { IconaPlatformConfig, PLATFORM_NAME, PLUGIN_NAME } from './index';
 import { IconaBridgeClient } from 'comelit-client/dist/icona-bridge-client';
-import { GateAccessory } from './accessories/gate-accessory';
+import { DoorAccessory } from './accessories/door-accessory';
 import { capitalize } from 'lodash';
 
 export class IconaPlatform implements DynamicPlatformPlugin {
@@ -63,19 +64,20 @@ export class IconaPlatform implements DynamicPlatformPlugin {
                 'Restoring existing accessory from cache:',
                 existingAccessory.displayName
               );
-              new GateAccessory(this, existingAccessory, config, this.log);
+              new DoorAccessory(this, existingAccessory, config, this.log);
             } else {
               // the accessory does not yet exist, so we need to create it
               this.log.info('Adding new accessory:', item.name);
               // create a new accessory
               const accessory = new this.api.platformAccessory(
                 capitalize(item.name.toLocaleLowerCase()),
-                uuid
+                uuid,
+                Categories.DOOR
               );
               // Store icona config data in context
               accessory.context.addressBookAll = addressBookAll;
               accessory.context.doorItem = item;
-              new GateAccessory(this, accessory, config, this.log);
+              new DoorAccessory(this, accessory, config, this.log);
               this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
             }
           });

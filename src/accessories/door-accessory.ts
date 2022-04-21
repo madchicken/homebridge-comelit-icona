@@ -2,10 +2,11 @@ import { IconaPlatform } from '../icona-platform';
 import { Logger, PlatformAccessory, Service } from 'homebridge';
 import { IconaBridgeClient } from 'comelit-client/dist/icona-bridge-client';
 import { ConfigurationResponse, DoorItem } from 'comelit-client';
-import { DeviceConfig, IconaPlatformConfig, SupportedTypes } from '../index';
+import { IconaPlatformConfig } from '../index';
 import { getDeviceConfigOrDefault } from '../utils';
 import { LockCurrentState } from 'hap-nodejs/dist/lib/definitions';
 import Timeout = NodeJS.Timeout;
+import { DeviceConfig, SupportedTypes } from '../types';
 
 export class DoorAccessory {
   private readonly platform: IconaPlatform;

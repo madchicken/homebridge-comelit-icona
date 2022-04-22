@@ -70,6 +70,9 @@ export class DoorAccessory {
           this.accessory.getService(this.platform.Service.GarageDoorOpener) ||
           this.accessory.addService(this.platform.Service.GarageDoorOpener);
         this.service
+          .getCharacteristic(Characteristic.CurrentDoorState)
+          .updateValue(Characteristic.CurrentDoorState.CLOSED);
+        this.service
           .getCharacteristic(Characteristic.TargetDoorState)
           .onSet(this.handleTargetPositionSet.bind(this));
         break;
@@ -169,18 +172,26 @@ export class DoorAccessory {
   private handleAsGarageDoor(deviceConfig: DeviceConfig) {
     const Characteristic = this.platform.Characteristic;
     this.service
-      .getCharacteristic(Characteristic.PositionState)
-      .updateValue(Characteristic.PositionState.INCREASING);
-    this.service.getCharacteristic(Characteristic.TargetPosition).updateValue(1);
+      .getCharacteristic(Characteristic.CurrentDoorState)
+      .updateValue(Characteristic.CurrentDoorState.OPENING);
+    this.service
+      .getCharacteristic(Characteristic.TargetDoorState)
+      .updateValue(Characteristic.TargetDoorState.OPEN);
     setTimeout(() => {
-      this.setGateOpened();
+      this.service
+        .getCharacteristic(Characteristic.CurrentDoorState)
+        .updateValue(Characteristic.CurrentDoorState.OPEN);
       this.closeTimeout = setTimeout(() => {
         this.service
-          .getCharacteristic(Characteristic.PositionState)
-          .updateValue(Characteristic.PositionState.DECREASING);
-        this.service.getCharacteristic(Characteristic.TargetPosition).updateValue(0);
+          .getCharacteristic(Characteristic.CurrentDoorState)
+          .updateValue(Characteristic.CurrentDoorState.CLOSING);
+        this.service
+          .getCharacteristic(Characteristic.TargetDoorState)
+          .updateValue(Characteristic.TargetDoorState.CLOSED);
         this.closingTimeout = setTimeout(() => {
-          this.setGateClosed();
+          this.service
+            .getCharacteristic(Characteristic.CurrentDoorState)
+            .updateValue(Characteristic.CurrentDoorState.CLOSED);
         }, deviceConfig.opening_time * 1000);
       }, deviceConfig.opened_time * 1000);
     }, deviceConfig.closing_time * 1000);
@@ -192,21 +203,5 @@ export class DoorAccessory {
 
   private getAddressBookAll() {
     return this.accessory.context.addressBookAll as ConfigurationResponse;
-  }
-
-  private setGateOpened() {
-    const Characteristic = this.platform.Characteristic;
-    this.service
-      .getCharacteristic(Characteristic.PositionState)
-      .updateValue(Characteristic.PositionState.STOPPED);
-    this.service.getCharacteristic(Characteristic.CurrentPosition).updateValue(1);
-  }
-
-  private setGateClosed() {
-    const Characteristic = this.platform.Characteristic;
-    this.service
-      .getCharacteristic(Characteristic.PositionState)
-      .updateValue(Characteristic.PositionState.STOPPED);
-    this.service.getCharacteristic(Characteristic.CurrentPosition).updateValue(0);
   }
 }

@@ -89,10 +89,6 @@ export class DoorAccessory {
           .getCharacteristic(Characteristic.LockTargetState)
           .onSet(this.handleTargetPositionSet.bind(this));
     }
-
-    this.service
-      .getCharacteristic(Characteristic.TargetPosition)
-      .onSet(this.handleTargetPositionSet.bind(this));
   }
 
   private async initClient() {

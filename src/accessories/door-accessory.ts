@@ -54,11 +54,17 @@ export class DoorAccessory {
           minStep: 1,
           validValues: [0, 1],
         });
+        this.service
+          .getCharacteristic(Characteristic.TargetPosition)
+          .onSet(this.handleTargetPositionSet.bind(this));
         break;
       case SupportedTypes.garage_door:
         this.service =
           this.accessory.getService(this.platform.Service.GarageDoorOpener) ||
           this.accessory.addService(this.platform.Service.GarageDoorOpener);
+        this.service
+          .getCharacteristic(Characteristic.TargetDoorState)
+          .onSet(this.handleTargetPositionSet.bind(this));
         break;
       case SupportedTypes.lock:
       default:
@@ -71,11 +77,11 @@ export class DoorAccessory {
             Characteristic.LockCurrentState.SECURED,
           ],
         });
+        this.service
+          .getCharacteristic(Characteristic.LockTargetState)
+          .onSet(this.handleTargetPositionSet.bind(this));
     }
 
-    this.lockManagementService =
-      this.accessory.getService(this.platform.Service.LockManagement) ||
-      this.accessory.addService(this.platform.Service.LockManagement);
     this.service
       .getCharacteristic(Characteristic.TargetPosition)
       .onSet(this.handleTargetPositionSet.bind(this));

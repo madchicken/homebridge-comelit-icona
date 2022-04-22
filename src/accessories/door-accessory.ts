@@ -4,7 +4,6 @@ import { IconaBridgeClient } from 'comelit-client/dist/icona-bridge-client';
 import { ConfigurationResponse, DoorItem } from 'comelit-client';
 import { IconaPlatformConfig } from '../index';
 import { getDeviceConfigOrDefault } from '../utils';
-import { LockCurrentState } from 'hap-nodejs/dist/lib/definitions';
 import Timeout = NodeJS.Timeout;
 import { DeviceConfig, SupportedTypes } from '../types';
 
@@ -67,7 +66,10 @@ export class DoorAccessory {
           this.accessory.getService(this.platform.Service.LockMechanism) ||
           this.accessory.addService(this.platform.Service.LockMechanism);
         this.service.getCharacteristic(Characteristic.LockCurrentState).setProps({
-          validValues: [LockCurrentState.UNSECURED, LockCurrentState.SECURED],
+          validValues: [
+            Characteristic.LockCurrentState.UNSECURED,
+            Characteristic.LockCurrentState.SECURED,
+          ],
         });
     }
 

@@ -74,7 +74,7 @@ export class DoorAccessory {
           .updateValue(Characteristic.CurrentDoorState.CLOSED);
         this.service
           .getCharacteristic(Characteristic.TargetDoorState)
-          .updateValue(Characteristic.CurrentDoorState.CLOSED);
+          .updateValue(Characteristic.TargetDoorState.CLOSED);
         this.service
           .getCharacteristic(Characteristic.TargetDoorState)
           .onSet(this.handleTargetPositionSet.bind(this));

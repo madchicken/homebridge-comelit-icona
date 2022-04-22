@@ -1,6 +1,6 @@
 import { IconaPlatform } from '../icona-platform';
 import { Logger, PlatformAccessory, Service } from 'homebridge';
-import { IconaBridgeClient } from 'comelit-client/dist/icona-bridge-client';
+import { IconaBridgeClient } from 'comelit-client';
 import { ConfigurationResponse, DoorItem } from 'comelit-client';
 import { IconaPlatformConfig } from '../index';
 import { getDeviceConfigOrDefault } from '../utils';

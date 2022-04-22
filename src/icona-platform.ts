@@ -10,7 +10,7 @@ import {
   Service,
 } from 'homebridge';
 import { IconaPlatformConfig, PLATFORM_NAME, PLUGIN_NAME } from './index';
-import { IconaBridgeClient } from 'comelit-client/dist/icona-bridge-client';
+import { IconaBridgeClient } from 'comelit-client';
 import { DoorAccessory } from './accessories/door-accessory';
 import { capitalize } from 'lodash';
 

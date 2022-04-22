@@ -14,10 +14,10 @@
         "default": "Icona"
       },
       "bridge_url": {
-        "title": "Bridge URL (Optional)",
+        "title": "Bridge URL",
         "Description": "URL of the Comelit HUB or Icona Bridge on your private network. You can use the Comelit CLI tool to discover it or leave it empty for auto discovery",
         "type": "string",
-        "required": false,
+        "required": true,
         "default": ""
       },
       "bridge_port": {
@@ -35,6 +35,7 @@
       },
       "devices": {
         "type": "array",
+        "required": false,
         "items": [
           {
             "type": "object",
@@ -85,10 +86,11 @@
       "type": "fieldset",
       "expandable": false,
       "title": "Device settings",
+      "orderable": false,
       "items": [
         {
           "type": "help",
-          "helpvalue": "<em class='primary-text'>Enter friendly names for your devices</em>"
+          "helpvalue": "<em class='primary-text'>Enter custom configuration your devices (Optional)</em>"
         },
         {
           "nodescription": true,
@@ -99,26 +101,35 @@
           "items": [
             {
               "type": "div",
+              "displayFlex": true,
               "items": [
                 {
+                  "flex": "1 1 50px",
                   "title": "Gate/Door Name",
                   "type": "string",
                   "required": true,
                   "key": "devices[].name"
                 },
                 {
+                  "flex": "1 1 50px",
                   "title": "Gate/Door Type",
                   "type": "string",
                   "required": true,
                   "key": "devices[].type"
                 },
                 {
+                  "condition": {
+                    "functionBody": "return model.devices[arrayIndices].type === 'door' || model.devices[arrayIndices].type === 'garage_door';"
+                  },
                   "title": "Opening time",
                   "type": "number",
                   "required": true,
                   "key": "devices[].opening_time"
                 },
                 {
+                  "condition": {
+                    "functionBody": "return model.devices[arrayIndices].type === 'door' || model.devices[arrayIndices].type === 'garage_door';"
+                  },
                   "title": "Closing time",
                   "type": "number",
                   "required": true,

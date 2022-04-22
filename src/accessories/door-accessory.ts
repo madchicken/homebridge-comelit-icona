@@ -14,7 +14,6 @@ export class DoorAccessory {
   private readonly config: IconaPlatformConfig;
 
   private service: Service;
-  private lockManagementService: Service;
 
   private closeTimeout: Timeout;
   private closingTimeout: Timeout;
@@ -35,8 +34,15 @@ export class DoorAccessory {
     const doorItem = this.getDoorItem();
     const deviceConfig = getDeviceConfigOrDefault(this.config, doorItem);
 
+    const infoService =
+      this.accessory.getService(this.platform.Service.AccessoryInformation) ||
+      this.accessory.addService(this.platform.Service.AccessoryInformation);
+    infoService.getCharacteristic(this.platform.Characteristic.Manufacturer).setValue('Comelit');
+    infoService.getCharacteristic(this.platform.Characteristic.Model).setValue('ICONA');
+
     switch (deviceConfig.type) {
       case SupportedTypes.door:
+        this.log.info(`Mounting ${this.accessory.displayName} as Door`);
         this.service =
           this.accessory.getService(this.platform.Service.Door) ||
           this.accessory.addService(this.platform.Service.Door);
@@ -59,6 +65,7 @@ export class DoorAccessory {
           .onSet(this.handleTargetPositionSet.bind(this));
         break;
       case SupportedTypes.garage_door:
+        this.log.info(`Mounting ${this.accessory.displayName} as Garage Door`);
         this.service =
           this.accessory.getService(this.platform.Service.GarageDoorOpener) ||
           this.accessory.addService(this.platform.Service.GarageDoorOpener);
@@ -68,6 +75,7 @@ export class DoorAccessory {
         break;
       case SupportedTypes.lock:
       default:
+        this.log.info(`Mounting ${this.accessory.displayName} as Lock`);
         this.service =
           this.accessory.getService(this.platform.Service.LockMechanism) ||
           this.accessory.addService(this.platform.Service.LockMechanism);

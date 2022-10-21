@@ -19,6 +19,8 @@ export class DoorAccessory {
   private closingTimeout: Timeout;
   private client: IconaBridgeClient;
 
+  private lockState;
+
   constructor(
     platform: IconaPlatform,
     accessory: PlatformAccessory,
@@ -29,7 +31,10 @@ export class DoorAccessory {
     this.accessory = accessory;
     this.config = config;
     this.log = log;
+
     const Characteristic = this.platform.Characteristic;
+
+    this.lockState = Characteristic.LockCurrentState.SECURED;
 
     const doorItem = this.getDoorItem();
     const deviceConfig = getDeviceConfigOrDefault(this.config, doorItem);
@@ -85,15 +90,12 @@ export class DoorAccessory {
         this.service =
           this.accessory.getService(this.platform.Service.LockMechanism) ||
           this.accessory.addService(this.platform.Service.LockMechanism);
-        this.service.getCharacteristic(Characteristic.LockCurrentState).setProps({
-          validValues: [
-            Characteristic.LockCurrentState.UNSECURED,
-            Characteristic.LockCurrentState.SECURED,
-          ],
-        });
+        this.service.getCharacteristic(Characteristic.LockCurrentState)
+          .onGet(this.handleCurrentPosition.bind(this));
         this.service
           .getCharacteristic(Characteristic.LockTargetState)
-          .onSet(this.handleTargetPositionSet.bind(this));
+          .onSet(this.handleTargetPositionSet.bind(this))
+          .onGet(this.handleCurrentPosition.bind(this));
     }
   }
 
@@ -118,7 +120,7 @@ export class DoorAccessory {
     this.log.debug('Triggered SET TargetPosition:' + value);
     try {
       await this.initClient();
-      this.log.info(`ICONA Client initialized`);
+      this.log.debug(`ICONA Client initialized`);
     } catch (e) {
       this.log.info(`ICONA Client failed to initialize: ${e.message}`);
     }
@@ -147,15 +149,24 @@ export class DoorAccessory {
     }
   }
 
+  private async handleCurrentPosition() {
+    return this.lockState;
+  }
+
   private handleAsLock(deviceConfig: DeviceConfig) {
     const Characteristic = this.platform.Characteristic;
+    this.lockState = Characteristic.LockCurrentState.UNSECURED;
     this.service
-      .getCharacteristic(Characteristic.LockTargetState)
-      .updateValue(Characteristic.LockTargetState.UNSECURED);
+      .getCharacteristic(Characteristic.LockCurrentState)
+      .updateValue(this.lockState);
     this.closeTimeout = setTimeout(() => {
+      this.lockState = Characteristic.LockCurrentState.SECURED;
       this.service
         .getCharacteristic(Characteristic.LockTargetState)
-        .updateValue(Characteristic.LockTargetState.SECURED);
+        .updateValue(this.lockState);
+      this.service
+        .getCharacteristic(Characteristic.LockCurrentState)
+        .updateValue(this.lockState);
     }, deviceConfig.opened_time * 1000);
   }
 

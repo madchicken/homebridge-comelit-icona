@@ -6,6 +6,7 @@ import { IconaPlatformConfig } from '../index';
 import { getDeviceConfigOrDefault } from '../utils';
 import Timeout = NodeJS.Timeout;
 import { DeviceConfig, SupportedTypes } from '../types';
+import { ActuatorDoorItem } from 'comelit-client/dist/icona/types';
 
 export class DoorAccessory {
   private readonly platform: IconaPlatform;
@@ -20,17 +21,20 @@ export class DoorAccessory {
   private client: IconaBridgeClient;
 
   private lockState;
+  private readonly isActuator;
 
   constructor(
     platform: IconaPlatform,
     accessory: PlatformAccessory,
     config: IconaPlatformConfig,
-    log: Logger
+    log: Logger,
+    isActuator = false
   ) {
     this.platform = platform;
     this.accessory = accessory;
     this.config = config;
     this.log = log;
+    this.isActuator = isActuator;
 
     const Characteristic = this.platform.Characteristic;
 
@@ -90,7 +94,8 @@ export class DoorAccessory {
         this.service =
           this.accessory.getService(this.platform.Service.LockMechanism) ||
           this.accessory.addService(this.platform.Service.LockMechanism);
-        this.service.getCharacteristic(Characteristic.LockCurrentState)
+        this.service
+          .getCharacteristic(Characteristic.LockCurrentState)
           .onGet(this.handleCurrentPosition.bind(this));
         this.service
           .getCharacteristic(Characteristic.LockTargetState)
@@ -99,20 +104,6 @@ export class DoorAccessory {
     }
   }
 
-  private async initClient() {
-    const client = new IconaBridgeClient(this.config.bridge_url, this.config.bridge_port, this.log);
-    await client.connect();
-    const code = await client.authenticate(this.config.icona_token);
-    if (code === 200) {
-      const addressBookAll = this.getAddressBookAll();
-      await client.openDoorInit(addressBookAll.vip);
-      this.client = client;
-    } else {
-      await client.shutdown();
-      this.client = null;
-      throw new Error(`Error during authentication (${code})`);
-    }
-  }
   /**
    * Handle requests to set the "Target Position" characteristic
    */
@@ -126,9 +117,18 @@ export class DoorAccessory {
     }
     if (this.client) {
       const addressBookAll = this.getAddressBookAll();
-      const doorItem = this.getDoorItem();
-      const deviceConfig = getDeviceConfigOrDefault(this.config, doorItem);
-      await this.client.openDoor(addressBookAll.vip, doorItem);
+      let deviceConfig;
+      if (this.isActuator) {
+        this.log.debug('Device is an actuator, sending openActuator command');
+        const actuatorItem = this.getActuatorItem();
+        const deviceConfig = getDeviceConfigOrDefault(this.config, actuatorItem);
+        await this.client.openActuator(addressBookAll.vip, actuatorItem);
+      } else {
+        this.log.debug('Device is a door, sending openDoor command');
+        const doorItem = this.getDoorItem();
+        const deviceConfig = getDeviceConfigOrDefault(this.config, doorItem);
+        await this.client.openDoor(addressBookAll.vip, doorItem);
+      }
       await this.client.shutdown();
       this.client = null;
       clearTimeout(this.closeTimeout);
@@ -149,6 +149,21 @@ export class DoorAccessory {
     }
   }
 
+  private async initClient() {
+    const client = new IconaBridgeClient(this.config.bridge_url, this.config.bridge_port, this.log);
+    await client.connect();
+    const code = await client.authenticate(this.config.icona_token);
+    if (code === 200) {
+      const addressBookAll = this.getAddressBookAll();
+      await client.openDoorInit(addressBookAll.vip);
+      this.client = client;
+    } else {
+      await client.shutdown();
+      this.client = null;
+      throw new Error(`Error during authentication (${code})`);
+    }
+  }
+
   private async handleCurrentPosition() {
     return this.lockState;
   }
@@ -156,17 +171,11 @@ export class DoorAccessory {
   private handleAsLock(deviceConfig: DeviceConfig) {
     const Characteristic = this.platform.Characteristic;
     this.lockState = Characteristic.LockCurrentState.UNSECURED;
-    this.service
-      .getCharacteristic(Characteristic.LockCurrentState)
-      .updateValue(this.lockState);
+    this.service.getCharacteristic(Characteristic.LockCurrentState).updateValue(this.lockState);
     this.closeTimeout = setTimeout(() => {
       this.lockState = Characteristic.LockCurrentState.SECURED;
-      this.service
-        .getCharacteristic(Characteristic.LockTargetState)
-        .updateValue(this.lockState);
-      this.service
-        .getCharacteristic(Characteristic.LockCurrentState)
-        .updateValue(this.lockState);
+      this.service.getCharacteristic(Characteristic.LockTargetState).updateValue(this.lockState);
+      this.service.getCharacteristic(Characteristic.LockCurrentState).updateValue(this.lockState);
     }, deviceConfig.opened_time * 1000);
   }
 
@@ -211,11 +220,15 @@ export class DoorAccessory {
     }, deviceConfig.closing_time * 1000);
   }
 
-  private getDoorItem() {
+  private getDoorItem(): DoorItem {
     return this.accessory.context.doorItem as DoorItem;
   }
 
-  private getAddressBookAll() {
+  private getActuatorItem(): ActuatorDoorItem {
+    return this.accessory.context.actuatorItem as ActuatorDoorItem;
+  }
+
+  private getAddressBookAll(): ConfigurationResponse {
     return this.accessory.context.addressBookAll as ConfigurationResponse;
   }
 }

@@ -10,9 +10,10 @@ import {
   Service,
 } from 'homebridge';
 import { IconaPlatformConfig, PLATFORM_NAME, PLUGIN_NAME } from './index';
-import { IconaBridgeClient } from 'comelit-client';
+import { ConfigurationResponse, DoorItem, IconaBridgeClient } from 'comelit-client';
 import { DoorAccessory } from './accessories/door-accessory';
 import { capitalize } from 'lodash';
+import { ActuatorDoorItem } from 'comelit-client/dist/icona/types';
 
 export class IconaPlatform implements DynamicPlatformPlugin {
   private readonly log: Logging;
@@ -47,41 +48,10 @@ export class IconaPlatform implements DynamicPlatformPlugin {
               'Available doors: %o',
               addressBookAll.vip['user-parameters']['opendoor-address-book']
             );
-            addressBookAll.vip['user-parameters']['opendoor-address-book'].forEach(item => {
-              // generate a unique id for the accessory this should be generated from
-              // something globally unique, but constant, for example, the device serial
-              // number or MAC address
-              const uuid = this.api.hap.uuid.generate(
-                `${item.name}-${item['apt-address']}:${item['output-index']}`
-              );
-
-              // see if an accessory with the same uuid has already been registered and restored from
-              // the cached devices we stored in the `configureAccessory` method above
-              const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
-
-              if (existingAccessory) {
-                // the accessory already exists
-                this.log.info(
-                  'Restoring existing accessory from cache:',
-                  existingAccessory.displayName
-                );
-                new DoorAccessory(this, existingAccessory, config, this.log);
-              } else {
-                // the accessory does not yet exist, so we need to create it
-                this.log.info('Adding new accessory:', item.name);
-                // create a new accessory
-                const accessory = new this.api.platformAccessory(
-                  capitalize(item.name.toLocaleLowerCase()),
-                  uuid,
-                  Categories.DOOR
-                );
-                // Store icona config data in context
-                accessory.context.addressBookAll = addressBookAll;
-                accessory.context.doorItem = item;
-                new DoorAccessory(this, accessory, config, this.log);
-                this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
-              }
-            });
+            const openDoorItems = addressBookAll.vip['user-parameters']['opendoor-address-book'];
+            openDoorItems.forEach(item => this.mapOpenDoorItem(item, config, addressBookAll));
+            const actuatorItems = addressBookAll.vip['user-parameters']['actuator-address-book'];
+            actuatorItems.forEach(item => this.mapOpenDoorItem(item, config, addressBookAll));
           } else {
             this.log.error(`No configuration received from ICONA client. Shutting down.`);
           }
@@ -96,6 +66,80 @@ export class IconaPlatform implements DynamicPlatformPlugin {
         await client?.shutdown();
       }
     };
+  }
+
+  mapOpenDoorItem(
+    item: DoorItem,
+    config: IconaPlatformConfig,
+    addressBookAll: ConfigurationResponse
+  ) {
+    // generate a unique id for the accessory this should be generated from
+    // something globally unique, but constant, for example, the device serial
+    // number or MAC address
+    const uuid = this.api.hap.uuid.generate(
+      `${item.name}-${item['apt-address']}:${item['output-index']}`
+    );
+
+    // see if an accessory with the same uuid has already been registered and restored from
+    // the cached devices we stored in the `configureAccessory` method above
+    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+
+    if (existingAccessory) {
+      // the accessory already exists
+      this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+      new DoorAccessory(this, existingAccessory, config, this.log);
+    } else {
+      // the accessory does not yet exist, so we need to create it
+      this.log.info('Adding new accessory:', item.name);
+      // create a new accessory
+      const accessory = new this.api.platformAccessory(
+        capitalize(item.name.toLocaleLowerCase()),
+        uuid,
+        Categories.DOOR
+      );
+      // Store icona config data in context
+      accessory.context.addressBookAll = addressBookAll;
+      accessory.context.doorItem = item;
+      new DoorAccessory(this, accessory, config, this.log);
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+    }
+  }
+
+  mapActuatorItem(
+    item: ActuatorDoorItem,
+    config: IconaPlatformConfig,
+    addressBookAll: ConfigurationResponse
+  ) {
+    // generate a unique id for the accessory this should be generated from
+    // something globally unique, but constant, for example, the device serial
+    // number or MAC address
+    const uuid = this.api.hap.uuid.generate(
+      `${item.name}-${item['apt-address']}:${item['output-index']}`
+    );
+
+    // see if an accessory with the same uuid has already been registered and restored from
+    // the cached devices we stored in the `configureAccessory` method above
+    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+
+    if (existingAccessory) {
+      // the accessory already exists
+      this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+      new DoorAccessory(this, existingAccessory, config, this.log, true);
+    } else {
+      // the accessory does not yet exist, so we need to create it
+      this.log.info('Adding new accessory:', item.name);
+      // create a new accessory
+      const accessory = new this.api.platformAccessory(
+        capitalize(item.name.toLocaleLowerCase()),
+        uuid,
+        Categories.DOOR
+      );
+      // Store icona config data in context
+      accessory.context.addressBookAll = addressBookAll;
+      accessory.context.actuatorItem = item;
+      new DoorAccessory(this, accessory, config, this.log, true);
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+    }
   }
 
   configureAccessory(accessory: PlatformAccessory): void {

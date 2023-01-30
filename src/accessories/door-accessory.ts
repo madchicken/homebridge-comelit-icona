@@ -121,12 +121,12 @@ export class DoorAccessory {
       if (this.isActuator) {
         this.log.debug('Device is an actuator, sending openActuator command');
         const actuatorItem = this.getActuatorItem();
-        const deviceConfig = getDeviceConfigOrDefault(this.config, actuatorItem);
+        deviceConfig = getDeviceConfigOrDefault(this.config, actuatorItem);
         await this.client.openActuator(addressBookAll.vip, actuatorItem);
       } else {
         this.log.debug('Device is a door, sending openDoor command');
         const doorItem = this.getDoorItem();
-        const deviceConfig = getDeviceConfigOrDefault(this.config, doorItem);
+        deviceConfig = getDeviceConfigOrDefault(this.config, doorItem);
         await this.client.openDoor(addressBookAll.vip, doorItem);
       }
       await this.client.shutdown();

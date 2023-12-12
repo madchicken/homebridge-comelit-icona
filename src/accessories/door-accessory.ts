@@ -40,8 +40,15 @@ export class DoorAccessory {
 
     this.lockState = Characteristic.LockCurrentState.SECURED;
 
-    const doorItem = this.getDoorItem();
-    const deviceConfig = getDeviceConfigOrDefault(this.config, doorItem);
+    let deviceConfig;
+
+    if (this.isActuator) {
+      const actuatorItem = this.getActuatorItem();
+      deviceConfig = getDeviceConfigOrDefault(this.config, actuatorItem);
+    } else {
+      const doorItem = this.getDoorItem();
+      deviceConfig = getDeviceConfigOrDefault(this.config, doorItem);
+    }
 
     const infoService =
       this.accessory.getService(this.platform.Service.AccessoryInformation) ||

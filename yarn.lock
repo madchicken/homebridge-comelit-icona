@@ -1269,10 +1269,10 @@ combined-stream@^1.0.8:
   dependencies:
     delayed-stream "~1.0.0"
 
-comelit-client@2.5.4-rc.0:
-  version "2.5.4-rc.0"
-  resolved "https://registry.yarnpkg.com/comelit-client/-/comelit-client-2.5.4-rc.0.tgz#c006ab2625614227100ba169c64d013e26a3eb33"
-  integrity sha512-EXUTev10tBqE6DprvW3PeIUoGBwXdENtugXmY+/CrIMZBJXwsbhGYrCNPO+8ACbcsuZ2hdWbfheOfqvMjuTA0Q==
+comelit-client@2.5.3:
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/comelit-client/-/comelit-client-2.5.3.tgz#875c4e34c7663fbeb899b0b66253dc3e0d208c6b"
+  integrity sha512-tllDSBnWYtRqrpmjBK0W/Bu0H+ly43gXS9vJ/1GZfAA0lORuMuZTuIW8bG4X3K2SI6tnDugv6+GeP/5cZHVTVw==
   dependencies:
     async-mqtt "2.6.1"
     atob "2.1.2"

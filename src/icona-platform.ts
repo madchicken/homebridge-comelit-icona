@@ -51,7 +51,7 @@ export class IconaPlatform implements DynamicPlatformPlugin {
             const openDoorItems = addressBookAll.vip['user-parameters']['opendoor-address-book'];
             openDoorItems.forEach(item => this.mapOpenDoorItem(item, config, addressBookAll));
             const actuatorItems = addressBookAll.vip['user-parameters']['actuator-address-book'];
-            actuatorItems.forEach(item => this.mapOpenDoorItem(item, config, addressBookAll));
+            actuatorItems.forEach(item => this.mapActuatorItem(item, config, addressBookAll));
           } else {
             this.log.error(`No configuration received from ICONA client. Shutting down.`);
           }

@@ -58,57 +58,47 @@ export class DoorAccessory {
 
     switch (deviceConfig.type) {
       case SupportedTypes.door:
-        this.log.info(`Mounting ${this.accessory.displayName} as Door`);
-        this.service =
-          this.accessory.getService(this.platform.Service.Door) ||
-          this.accessory.addService(this.platform.Service.Door);
-        this.service.getCharacteristic(Characteristic.TargetPosition).setProps({
-          unit: null,
-          minValue: 0,
-          maxValue: 1,
-          minStep: 1,
-          validValues: [0, 1],
-        });
-        this.service.getCharacteristic(Characteristic.CurrentPosition).setProps({
-          unit: null,
-          minValue: 0,
-          maxValue: 1,
-          minStep: 1,
-          validValues: [0, 1],
-        });
-        this.service
-          .getCharacteristic(Characteristic.TargetPosition)
-          .onSet(this.handleTargetPositionSet.bind(this));
+        this.mountAsDoor();
         break;
       case SupportedTypes.garage_door:
-        this.log.info(`Mounting ${this.accessory.displayName} as Garage Door`);
-        this.service =
-          this.accessory.getService(this.platform.Service.GarageDoorOpener) ||
-          this.accessory.addService(this.platform.Service.GarageDoorOpener);
-        this.service
-          .getCharacteristic(Characteristic.CurrentDoorState)
-          .updateValue(Characteristic.CurrentDoorState.CLOSED);
-        this.service
-          .getCharacteristic(Characteristic.TargetDoorState)
-          .updateValue(Characteristic.TargetDoorState.CLOSED);
-        this.service
-          .getCharacteristic(Characteristic.TargetDoorState)
-          .onSet(this.handleTargetPositionSet.bind(this));
+        this.mountAsGarageDoor();
         break;
       case SupportedTypes.lock:
       default:
-        this.log.info(`Mounting ${this.accessory.displayName} as Lock`);
-        this.service =
-          this.accessory.getService(this.platform.Service.LockMechanism) ||
-          this.accessory.addService(this.platform.Service.LockMechanism);
-        this.service
-          .getCharacteristic(Characteristic.LockCurrentState)
-          .onGet(this.handleCurrentPosition.bind(this));
-        this.service
-          .getCharacteristic(Characteristic.LockTargetState)
-          .onSet(this.handleTargetPositionSet.bind(this))
-          .onGet(this.handleCurrentPosition.bind(this));
+        this.mountAsLock();
     }
+  }
+
+  private mountAsLock() {
+    const Characteristic = this.platform.Characteristic;
+    this.log.info(`Mounting ${this.accessory.displayName} as Lock`);
+    this.service =
+      this.accessory.getService(this.platform.Service.LockMechanism) ||
+      this.accessory.addService(this.platform.Service.LockMechanism);
+    this.service
+      .getCharacteristic(Characteristic.LockCurrentState)
+      .onGet(this.handleCurrentPosition.bind(this));
+    this.service
+      .getCharacteristic(Characteristic.LockTargetState)
+      .onSet(this.handleTargetPositionSet.bind(this))
+      .onGet(this.handleCurrentPosition.bind(this));
+  }
+
+  private mountAsGarageDoor() {
+    const Characteristic = this.platform.Characteristic;
+    this.log.info(`Mounting ${this.accessory.displayName} as Garage Door`);
+    this.service =
+      this.accessory.getService(this.platform.Service.GarageDoorOpener) ||
+      this.accessory.addService(this.platform.Service.GarageDoorOpener);
+    this.service
+      .getCharacteristic(Characteristic.CurrentDoorState)
+      .updateValue(Characteristic.CurrentDoorState.CLOSED);
+    this.service
+      .getCharacteristic(Characteristic.TargetDoorState)
+      .updateValue(Characteristic.TargetDoorState.CLOSED);
+    this.service
+      .getCharacteristic(Characteristic.TargetDoorState)
+      .onSet(this.handleTargetPositionSet.bind(this));
   }
 
   /**
@@ -154,6 +144,31 @@ export class DoorAccessory {
     } else {
       this.log.error(`ICONA Authentication failed`);
     }
+  }
+
+  private mountAsDoor() {
+    const Characteristic = this.platform.Characteristic;
+    this.log.info(`Mounting ${this.accessory.displayName} as Door`);
+    this.service =
+      this.accessory.getService(this.platform.Service.Door) ||
+      this.accessory.addService(this.platform.Service.Door);
+    this.service.getCharacteristic(Characteristic.TargetPosition).setProps({
+      unit: null,
+      minValue: 0,
+      maxValue: 1,
+      minStep: 1,
+      validValues: [0, 1],
+    });
+    this.service.getCharacteristic(Characteristic.CurrentPosition).setProps({
+      unit: null,
+      minValue: 0,
+      maxValue: 1,
+      minStep: 1,
+      validValues: [0, 1],
+    });
+    this.service
+      .getCharacteristic(Characteristic.TargetPosition)
+      .onSet(this.handleTargetPositionSet.bind(this));
   }
 
   private async initClient() {

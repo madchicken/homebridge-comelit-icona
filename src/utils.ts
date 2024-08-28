@@ -14,10 +14,18 @@ export function getDeviceConfigOrDefault(
   config: IconaPlatformConfig,
   doorItem: DoorItem
 ): DeviceConfig {
-  return (
-    config.devices?.find(d => d.name === doorItem.name) || {
-      ...DEFAULT_DOOR_CONFIG,
-      name: doorItem.name,
-    }
-  );
+  let deviceConfig = config.devices?.find(d => d.name === doorItem.name) || {
+    ...DEFAULT_DOOR_CONFIG,
+    name: doorItem.name,
+  };
+  if (!deviceConfig.opened_time) {
+    deviceConfig.opened_time = DEFAULT_DOOR_CONFIG.opened_time;
+  }
+  if (!deviceConfig.opening_time) {
+    deviceConfig.opening_time = DEFAULT_DOOR_CONFIG.opening_time;
+  }
+  if (!deviceConfig.closing_time) {
+    deviceConfig.closing_time = DEFAULT_DOOR_CONFIG.closing_time;
+  }
+  return deviceConfig;
 }

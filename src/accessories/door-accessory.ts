@@ -7,6 +7,7 @@ import { getDeviceConfigOrDefault } from '../utils';
 import Timeout = NodeJS.Timeout;
 import { DeviceConfig, SupportedTypes } from '../types';
 import { ActuatorDoorItem } from 'comelit-client/dist/icona/types';
+import { LockCurrentState } from 'hap-nodejs/dist/lib/definitions/CharacteristicDefinitions';
 
 export class DoorAccessory {
   private readonly platform: IconaPlatform;
@@ -20,8 +21,8 @@ export class DoorAccessory {
   private closingTimeout: Timeout;
   private client: IconaBridgeClient;
 
-  private lockState;
-  private readonly isActuator;
+  private lockState: number;
+  private readonly isActuator: boolean;
 
   constructor(
     platform: IconaPlatform,
@@ -40,7 +41,7 @@ export class DoorAccessory {
 
     this.lockState = Characteristic.LockCurrentState.SECURED;
 
-    let deviceConfig;
+    let deviceConfig: DeviceConfig;
 
     if (this.isActuator) {
       const actuatorItem = this.getActuatorItem();
@@ -114,7 +115,7 @@ export class DoorAccessory {
     }
     if (this.client) {
       const addressBookAll = this.getAddressBookAll();
-      let deviceConfig;
+      let deviceConfig: DeviceConfig;
       if (this.isActuator) {
         this.log.debug('Device is an actuator, sending openActuator command');
         const actuatorItem = this.getActuatorItem();
@@ -167,6 +168,9 @@ export class DoorAccessory {
       validValues: [0, 1],
     });
     this.service
+      .getCharacteristic(Characteristic.PositionState)
+      .updateValue(Characteristic.PositionState.STOPPED);
+    this.service
       .getCharacteristic(Characteristic.TargetPosition)
       .onSet(this.handleTargetPositionSet.bind(this));
   }
@@ -205,6 +209,9 @@ export class DoorAccessory {
     const Characteristic = this.platform.Characteristic;
     this.service.getCharacteristic(Characteristic.TargetPosition).updateValue(1);
     this.service.getCharacteristic(Characteristic.CurrentPosition).updateValue(1);
+    this.service
+      .getCharacteristic(Characteristic.PositionState)
+      .updateValue(Characteristic.PositionState.INCREASING);
     this.closeTimeout = setTimeout(() => {
       this.service
         .getCharacteristic(Characteristic.PositionState)
